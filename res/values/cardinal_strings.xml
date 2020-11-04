@@ -22,4 +22,8 @@
     <!-- Application name -->
     <string name="cardinal_app_name" translatable="false">Cardinal Launcher</string>
 
+    <!-- Suggestions -->
+    <string name="suggestion_pref_screen_title">Suggestions</string>
+    <string name="suggestion_pref_screen_desc">For All Apps &amp; Home screen suggestions</string>
+
 </resources>
