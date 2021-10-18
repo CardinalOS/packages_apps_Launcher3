@@ -338,6 +338,15 @@ public class TaskOverlayFactory implements ResourceBasedOverride {
             }
 
             @Override
+            public void onLens() {
+                if (mIsAllowedByPolicy) {
+                    endLiveTileMode(() -> mImageApi.startLensActivity());
+                } else {
+                    showBlockedByPolicyMessage();
+                }
+            }
+
+            @Override
             public void onClearAllTasksRequested() {
                 endLiveTileMode(TaskOverlay.this::clearAllTasks);
             }
@@ -354,6 +363,8 @@ public class TaskOverlayFactory implements ResourceBasedOverride {
 
         /** User wants to start split screen with current app. */
         void onSplit();
+
+        void onLens();
 
         void onClearAllTasksRequested();
     }
