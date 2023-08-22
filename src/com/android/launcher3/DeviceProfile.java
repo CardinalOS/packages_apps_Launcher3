@@ -219,6 +219,7 @@ public class DeviceProfile {
     private final int mMinHotseatQsbWidthPx;
     private final int mMaxHotseatIconSpacePx;
     public final int inlineNavButtonsEndSpacingPx;
+    private boolean mShowQsb;
 
     // Bottom sheets
     public int bottomSheetTopPadding;
@@ -491,10 +492,11 @@ public class DeviceProfile {
         hotseatQsbVisualHeight = hotseatQsbHeight - 2 * hotseatQsbShadowHeight;
 
         // Whether QSB might be inline in appropriate orientation (e.g. landscape).
-        boolean canQsbInline = (isTwoPanels ? inv.inlineQsb[INDEX_TWO_PANEL_PORTRAIT]
+        mShowQsb = Utilities.showQSB(context);
+        boolean canQsbInline = mShowQsb && (isTwoPanels ? inv.inlineQsb[INDEX_TWO_PANEL_PORTRAIT]
                 || inv.inlineQsb[INDEX_TWO_PANEL_LANDSCAPE]
                 : inv.inlineQsb[INDEX_DEFAULT] || inv.inlineQsb[INDEX_LANDSCAPE])
-                && hotseatQsbHeight > 0 && Utilities.showQSB(context)
+                && hotseatQsbHeight > 0 && Utilities.showQSB(context);
         isQsbInline = inv.inlineQsb[mTypeIndex] && canQsbInline;
 
         areNavButtonsInline = isTaskbarPresent && !isGestureMode;
@@ -504,8 +506,8 @@ public class DeviceProfile {
         numShownAllAppsColumns =
                 isTwoPanels ? inv.numDatabaseAllAppsColumns : inv.numAllAppsColumns;
 
-        int hotseatBarBottomSpace = Utilities.showQSB(context)
-                ? pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
+        int hotseatBarBottomSpace = mShowQsb || isTaskbarPresent ? pxFromDp(
+                inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
         int minQsbMargin = res.getDimensionPixelSize(R.dimen.min_qsb_margin);
 
         if (mIsResponsiveGrid) {
@@ -513,14 +515,13 @@ public class DeviceProfile {
                     HotseatSpecs.create(new ResourceHelper(context,
                             isTwoPanels ? inv.hotseatSpecsTwoPanelId : inv.hotseatSpecsId));
             mResponsiveHotseatSpec = hotseatSpecs.getCalculatedHeightSpec(heightPx);
-            hotseatQsbSpace = Utilities.showQSB(context) ? mResponsiveHotseatSpec.getHotseatQsbSpace() : 0;
+            hotseatQsbSpace = mShowQsb ? mResponsiveHotseatSpec.getHotseatQsbSpace() : 0;
         } else {
-            hotseatQsbSpace = Utilities.showQSB(context) ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
+            hotseatQsbSpace = mShowQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
         }
 
         // Have a little space between the inset and the QSB
-        if (Utilities.showQSB(context) &&
-                (mInsets.bottom + minQsbMargin) > hotseatBarBottomSpace) {
+        if (mShowQsb && mInsets.bottom + minQsbMargin > hotseatBarBottomSpace) {
             int availableSpace = hotseatQsbSpace - (mInsets.bottom - hotseatBarBottomSpace);
 
             // Only change the spaces if there is space
@@ -1144,6 +1145,9 @@ public class DeviceProfile {
     private int calculateHotseatBorderSpace(float hotseatWidthPx, int numExtraBorder) {
         int numBorders = (numShownHotseatIcons - 1 + numExtraBorder);
         if (numBorders <= 0) return 0;
+
+        // Calculate hotseat border space only if QSB available.
+        if(!mShowQsb) return 0;
 
         float hotseatIconsTotalPx = iconSizePx * numShownHotseatIcons;
         int hotseatBorderSpacePx = (int) (hotseatWidthPx - hotseatIconsTotalPx) / numBorders;
