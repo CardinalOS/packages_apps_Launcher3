@@ -72,8 +72,6 @@ import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-import javax.swing.text.Utilities;
-
 @SuppressLint("NewApi")
 public class DeviceProfile {
 
@@ -496,7 +494,7 @@ public class DeviceProfile {
                 || inv.inlineQsb[INDEX_TWO_PANEL_LANDSCAPE]
                 : inv.inlineQsb[INDEX_DEFAULT] || inv.inlineQsb[INDEX_LANDSCAPE])
                 && hotseatQsbHeight > 0;
-        isQsbInline = isScalableGrid && inv.inlineQsb[mTypeIndex] && canQsbInline;
+        isQsbInline = mIsScalableGrid && inv.inlineQsb[mTypeIndex] && canQsbInline;
 
         areNavButtonsInline = isTaskbarPresent && !isGestureMode;
         numShownHotseatIcons =
@@ -514,9 +512,9 @@ public class DeviceProfile {
                     HotseatSpecs.create(new ResourceHelper(context,
                             isTwoPanels ? inv.hotseatSpecsTwoPanelId : inv.hotseatSpecsId));
             mResponsiveHotseatSpec = hotseatSpecs.getCalculatedHeightSpec(heightPx);
-            hotseatQsbSpace = ShowQsb ? mResponsiveHotseatSpec.getHotseatQsbSpace() : 0;
+            hotseatQsbSpace = showQsb ? mResponsiveHotseatSpec.getHotseatQsbSpace() : 0;
         } else {
-            hotseatQsbSpace = ShowQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
+            hotseatQsbSpace = showQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
         }
 
         // Have a little space between the inset and the QSB
@@ -766,7 +764,7 @@ public class DeviceProfile {
      * necessary.
      */
     public void recalculateHotseatWidthAndBorderSpace() {
-        if (!(isScalableGrid || (isTaskbarPresent && !isLandscape))) return;
+        if (!(mIsScalableGrid || (isTaskbarPresent && !isLandscape))) return;
 
         int columns = inv.hotseatColumnSpan[mTypeIndex];
         float hotseatWidthPx = getIconToIconWidthForColumns(columns);
